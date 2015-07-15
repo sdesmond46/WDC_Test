@@ -61,17 +61,18 @@
     
     var connectionUrl = buildUrl(ticker, startDate, endDate);
 
-    var toRet = [];
-    var entry = {'Ticker': "Hey There", 
-                'Day': "2015/4/13", 
-                 'Close': 119.2};
-    toRet.push(entry);
-    tableau.dataCallback(toRet, toRet.length.toString(), false);
-    return;
+    // var toRet = [];
+    // var entry = {'Ticker': "Hey There", 
+    //             'Day': "2015/4/13", 
+    //              'Close': 119.2};
+    // toRet.push(entry);
+    // tableau.dataCallback(toRet, toRet.length.toString(), false);
+    // return;
 
     var xhr = $.ajax({
         url: connectionUrl,
         dataType: 'json',
+        async: false,
         success: function (data) {
             if (data.query.results) {
               var quotes = data.query.results.quote;
