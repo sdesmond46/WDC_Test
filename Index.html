@@ -42,42 +42,66 @@
     
     var connectionUrl = _buildUrl(ticker, startDate, endDate);
     tableau.log("Connection URL is " + connectionUrl);
-    var xhr = $.ajax({
-        url: connectionUrl,
-        dataType: 'json',
-        success: function (data) {
-            tableau.log("Successfully retrieved data");
 
-            var quotes = data.query.results.quote;
-            var ii;
-            var toRet = [];
+    $.getJSON( connectionUrl, function( data ) {
+      tableau.log("Successfully retrieved data");
 
-            // TODO - remove
-            // var entry = {'Ticker': null, 
-            //                  'Day': 'abc', 
-            //                  'Close': 22};
-            // toRet.push(entry);
+      var quotes = data.query.results.quote;
+      var ii;
+      var toRet = [];
 
-            // mash the data into an array of objects
-            for (ii = 0; ii < quotes.length; ++ii) {
-                // Each entry can be a list of values in the same order as the columns
-                //var entry = [quotes[ii].Symbol, quotes[ii].Date, quotes[ii].Close];
-                // or an object where the column names are the keys of the map
-                var entry = {'Ticker': quotes[ii].Symbol, 
-                             'Day': quotes[ii].Date, 
-                             'Close': quotes[ii].Close};
-                toRet.push(entry);
-            }
-            // Call back to tableau with the table data and the new record number (this is stored as a string)
-            tableau.dataCallback(toRet, toRet.length.toString(), false);
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-
-          // add something to the log and return an empty set if there was problem with the connection
-          tableau.log("connection error: " + xhr.responseText + "\n" + thrownError);
-          tableau.dataCallback([], lastRecordToken, false);
-        }
+      // mash the data into an array of objects
+      for (ii = 0; ii < quotes.length; ++ii) {
+          // Each entry can be a list of values in the same order as the columns
+          //var entry = [quotes[ii].Symbol, quotes[ii].Date, quotes[ii].Close];
+          // or an object where the column names are the keys of the map
+          var entry = {'Ticker': quotes[ii].Symbol, 
+                       'Day': quotes[ii].Date, 
+                       'Close': quotes[ii].Close};
+          toRet.push(entry);
+      }
+      // Call back to tableau with the table data and the new record number (this is stored as a string)
+      tableau.dataCallback(toRet, toRet.length.toString(), false);
+    }).fail(function() {
+      tableau.log( "error" );
     });
+
+    // var xhr = $.ajax({
+    //     url: connectionUrl,
+    //     dataType: 'json',
+    //     success: function (data) {
+    //         tableau.log("Successfully retrieved data");
+
+    //         var quotes = data.query.results.quote;
+    //         var ii;
+    //         var toRet = [];
+
+    //         // TODO - remove
+    //         // var entry = {'Ticker': null, 
+    //         //                  'Day': 'abc', 
+    //         //                  'Close': 22};
+    //         // toRet.push(entry);
+
+    //         // mash the data into an array of objects
+    //         for (ii = 0; ii < quotes.length; ++ii) {
+    //             // Each entry can be a list of values in the same order as the columns
+    //             //var entry = [quotes[ii].Symbol, quotes[ii].Date, quotes[ii].Close];
+    //             // or an object where the column names are the keys of the map
+    //             var entry = {'Ticker': quotes[ii].Symbol, 
+    //                          'Day': quotes[ii].Date, 
+    //                          'Close': quotes[ii].Close};
+    //             toRet.push(entry);
+    //         }
+    //         // Call back to tableau with the table data and the new record number (this is stored as a string)
+    //         tableau.dataCallback(toRet, toRet.length.toString(), false);
+    //     },
+    //     error: function (xhr, ajaxOptions, thrownError) {
+
+    //       // add something to the log and return an empty set if there was problem with the connection
+    //       tableau.log("connection error: " + xhr.responseText + "\n" + thrownError);
+    //       tableau.dataCallback([], lastRecordToken, false);
+    //     }
+    // });
   }
 
   // private methods
