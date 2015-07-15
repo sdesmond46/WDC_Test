@@ -60,6 +60,15 @@
     startDate.setYear(endDate.getFullYear() - 1);
     
     var connectionUrl = buildUrl(ticker, startDate, endDate);
+
+    var toRet = [];
+    var entry = {'Ticker': "Hey There", 
+                'Day': "2015/4/13", 
+                 'Close': 119.2};
+    toRet.push(entry);
+    tableau.dataCallback(toRet, toRet.length.toString(), false);
+    return;
+
     var xhr = $.ajax({
         url: connectionUrl,
         dataType: 'json',
