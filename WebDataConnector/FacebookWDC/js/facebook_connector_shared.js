@@ -3,7 +3,7 @@
 var CLIENT_ID = "475960835902299"; // This is Samm's personal app id
 // var CLIENT_ID = "131331403865338"; // This is the the Tableau id that Francois put in 
 var REQUESTED_SCOPE = "user_status,user_likes,user_posts";
-var REDIRECT_PAGE = "FacebookWDC/FB_Redirect.html";
+var REDIRECT_PAGE = "FB_Redirect.html";
 
 
 function _getFacebookAuthUrl() {
@@ -12,7 +12,10 @@ function _getFacebookAuthUrl() {
 		redirectUrl += ":" + window.location.port;
 	}
 	
-	redirectUrl += "/" + REDIRECT_PAGE;
+	var loc = window.location.pathname;
+	var dir = loc.substring(0, loc.lastIndexOf('/'));
+
+	redirectUrl += dir + "/" + REDIRECT_PAGE;
 
 	var url = "https://www.facebook.com/dialog/oauth?response_type=token&" +
 		"client_id=" + CLIENT_ID + "&" +
