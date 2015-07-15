@@ -32,6 +32,8 @@
   }
    
   myConnector.getTableData = function(lastRecordToken) {
+    tableau.log("Get Table data has been called");
+
     var endDate = new Date(),
         ticker = tableau.connectionData,
         startDate = new Date();
@@ -39,10 +41,13 @@
     startDate.setYear(endDate.getFullYear() - 1);
     
     var connectionUrl = _buildUrl(ticker, startDate, endDate);
+    tableau.log("Connection URL is " + connectionUrl);
     var xhr = $.ajax({
         url: connectionUrl,
         dataType: 'json',
         success: function (data) {
+            tableau.log("Successfully retrieved data");
+
             var quotes = data.query.results.quote;
             var ii;
             var toRet = [];
@@ -67,6 +72,7 @@
             tableau.dataCallback(toRet, toRet.length.toString(), false);
         },
         error: function (xhr, ajaxOptions, thrownError) {
+
           // add something to the log and return an empty set if there was problem with the connection
           tableau.log("connection error: " + xhr.responseText + "\n" + thrownError);
           tableau.dataCallback([], lastRecordToken, false);
