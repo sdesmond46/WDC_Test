@@ -1,0 +1,56 @@
+<html>
+<meta http-equiv="Cache-Control" content="no-store" />
+<head>
+<title>Stock Quote Connector</title>
+<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script> -->
+<script src="https://code.jquery.com/jquery-2.1.4.js" type="text/javascript"></script>
+<!-- <script src="https://public.tableau.com/javascripts/api/tableauwdc-1.1.0.js" type="text/javascript"></script> -->
+<script src="js/tableauwdc-1.1.0.js" type="text/javascript"></script>
+<script type="text/javascript">
+ (function() {
+  var formatLine = function(name, obj, indent) {
+    var type = typeof obj;
+    var line = indent + name + " - " + type + "\n";
+    return line;
+  }
+
+  var enumerateAll = function(obj, indent) {
+    var start = "";
+    for(var i in obj) {
+      var type = typeof obj[i];
+      start += formatLine(i, obj[i], indent);
+
+      if (type == "object") {
+        start += enumerateAll(obj[i], indent + "  ");
+      }
+    }
+
+    return start;
+  }
+
+  var myConnector = tableau.makeConnector();
+
+  myConnector.init = function() {
+    var output = formatLine("tableau", tableau, "");
+    output += enumerateAll(tableau, "  ");
+    console.log(output);
+
+    tableau.initCallback();
+    tableau.submit();
+  }
+
+  myConnector.getColumnHeaders = function() {
+  };
+   
+  myConnector.getTableData = function(lastRecordToken) {
+  };
+
+  tableau.registerConnector(myConnector);
+
+})();
+</script>
+</head>
+<body>
+  <h1> This doesn't do anything </h1>
+</body>
+</html>

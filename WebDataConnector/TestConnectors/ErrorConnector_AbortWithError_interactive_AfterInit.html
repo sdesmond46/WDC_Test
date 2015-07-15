@@ -1,0 +1,35 @@
+<html>
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <head>
+    <link type="text/css" rel="stylesheet" href="css/TestConnector.css"></link>
+    <title>Error Connector - Abort After Init</title>
+    <script src="js/jquery-1.11.1.min.js" type="text/javascript"></script>
+    <script src="../WebDataConnector_sdk/js/tableauwdc-1.1.0.js" type="text/javascript"></script>
+    <script type="text/javascript">
+    var myConnector = tableau.makeConnector();
+    myConnector.init = function() {
+        // call init and then report an error some time later
+        tableau.initCallback();
+        
+        setTimeout(
+            function(){ 
+                tableau.abortWithError("This is a WDC developer reported error after calling initCallback");
+            }, 
+            3000);
+    }
+    
+    myConnector.getColumnHeaders = function() {
+        // nothing called here since we'll throw an error earlier
+    }
+    
+    myConnector.getTableData = function(lastRecordNumber) {
+        // nothing called here since we'll throw an error earlier
+    }
+    
+    tableau.registerConnector(myConnector);
+    </script>
+  </head>
+  <body>
+    <h3>This connector will give you an error after successfully calling init callback but before calling submit. This should happen ~3 seconds after loading</h3>
+  </body>
+</html>

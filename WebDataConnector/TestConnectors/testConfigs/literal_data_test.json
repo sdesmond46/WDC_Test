@@ -1,0 +1,17 @@
+{
+	"autoSubmit": true,
+	"delayTime": 3000,
+	"fieldNames": ["Column A", "Column B"],
+	"fieldTypes": ["string", "int"],
+	"connectionData": "Bleepidyboop",
+	"connectionName": "Wahoosie! it's a predefined data connector Connector",
+	"literalData": 
+	[
+	  { "Column A": "Value One", "Column B" : 123},
+	  { "Column A": "Value Two", "Column B" : 55},
+	  { "Column A": "The Third Value", "Column B" : 23},
+	  { "Column A": "Value Two", "Column B" :  11},
+	  { "Column A": "Value Two", "Column B" : 543}
+	],
+	"lastRecordToken": "blah"
+}

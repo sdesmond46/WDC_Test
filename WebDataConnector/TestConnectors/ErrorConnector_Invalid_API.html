@@ -1,0 +1,17 @@
+<html>
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <head>
+    <link type="text/css" rel="stylesheet" href="css/TestConnector.css"></link>
+    <title>Error Connector - Invalid API</title>
+    <!-- Explicitly don't include the shim scrip so we can report a bad API
+    <script src="../WebDataConnector_sdk/js/tableauwdc-1.1.0.js" type="text/javascript"></script> -->
+    <script type="text/javascript">
+    console.log("Resizing window");
+    window.resizeTo(2000, 200);
+    tableauVersionBootstrap.ReportVersionNumber("8.1.1");
+    </script>
+  </head>
+  <body>
+    <h3>This connector will report an invalid version of the API and should show an error dialog</h3>
+  </body>
+</html>

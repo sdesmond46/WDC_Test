@@ -1,0 +1,157 @@
+<html>
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <head>
+    <title>Web Data Connector</title>
+    <style type="text/css">
+
+body {
+  font-family: sans-serif;
+  background-color: #F9F9F9;
+}
+
+.contentDiv {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-right: 30pt;
+  padding-left: 30pt;
+  position: relative;
+}
+
+
+.backgroundImage {
+  /* Need to embed the SVG background data here. Make sure it is URL escaped */
+  background-image: url("data:image/svg+xml;utf8,<svg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'viewBox='0 0 216.9 122.7'> <g> <circle opacity='0.68' fill-rule='evenodd' clip-rule='evenodd' fill='%235A7D9E' cx='118.1' cy='70.9' r='37.3'/> <circle opacity='0.68' fill-rule='evenodd' clip-rule='evenodd' fill='%235A7D9E' cx='117.6' cy='57.6' r='20.2'/> <circle opacity='0.68' fill-rule='evenodd' clip-rule='evenodd' fill='%235A7D9E' cx='80.3' cy='93.9' r='20.2'/> <circle opacity='0.68' fill-rule='evenodd' clip-rule='evenodd' fill='%235A7D9E' cx='169.1' cy='25.9' r='20.2'/> <circle opacity='0.68' fill-rule='evenodd' clip-rule='evenodd' fill='%235A7D9E' cx='50.9' cy='80.4' r='16'/> <circle opacity='0.68' fill-rule='evenodd' clip-rule='evenodd' fill='%235A7D9E' cx='41.6' cy='99.4' r='11.2'/> <circle opacity='0.68' fill-rule='evenodd' clip-rule='evenodd' fill='%235A7D9E' cx='150.6' cy='36.5' r='10.3'/> <circle opacity='0.68' fill-rule='evenodd' clip-rule='evenodd' fill='%235A7D9E' cx='155.3' cy='74.6' r='10.3'/> <circle opacity='0.68' fill-rule='evenodd' clip-rule='evenodd' fill='%235A7D9E' cx='19.3' cy='105.4' r='7.2'/> <circle opacity='0.68' fill-rule='evenodd' clip-rule='evenodd' fill='%235A7D9E' cx='206.3' cy='14.9' r='5.5'/> <circle opacity='0.68' fill-rule='evenodd' clip-rule='evenodd' fill='%235A7D9E' cx='10.1' cy='113.9' r='3.1'/> <circle opacity='0.68' fill-rule='evenodd' clip-rule='evenodd' fill='%235A7D9E' cx='186.2' cy='21.7' r='8.6'/> </g> </svg>");
+  background-repeat: no-repeat;
+  background-position: center; 
+  width: 100%;
+  height: 30%;
+  position: relative;
+  margin-bottom: 45pt;
+}
+
+
+.inputBar {
+  width: 100%;
+  height: 100%;
+}
+
+.inputBar input[type=text] {
+  margin: 0;
+  background-color: rgba(255,255,255,1);
+  position: absolute;
+  width: 100%;
+  font-size: 11pt;
+  padding:9pt;
+  left: 0%;
+  bottom: -15pt;
+  border: 1px solid #B2B2B2
+}
+
+input[type=text]:focus {
+  border: 1px solid rgb(0,0,0);
+  outline:none;
+}
+
+.recentConnectors {
+  margin: 10pt;
+}
+
+.recentConnectors ul {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+
+.recentConnectors h1 {
+  font-size: 10pt;
+  color: #B2B2B2;
+}
+
+.recentConnectors a {
+  color: #666666;
+  text-decoration: none;
+}
+
+.recentConnectors a:hover {
+  color: #597C9D;
+  text-decoration: none;
+}
+
+.recentConnectors .pageTitle {
+    font-size: 8pt;
+    margin-right: 3pt;
+}
+
+.recentConnectors .pageUrl {
+  font-size: 6pt;
+}
+
+.footer {
+  margin: 10pt;
+}
+
+.footerColumn {
+  margin-top: 40pt;
+  float: left;
+  width: calc(100% / 3);
+}
+
+#footer1 {
+  text-align: left;
+}
+
+#footer2 {
+  text-align: center;
+}
+
+#footer3 {
+  text-align: right;
+}
+
+.footerColumn a {
+  text-decoration: none;
+  font-size: 9pt;
+  color: #B2B2B2
+}
+
+.footerColumn a:hover {
+  text-decoration: none;
+  color: #4E4E4E
+}
+    </style>
+  </head>
+  <body>
+    <div class="contentDiv">
+      <div class="backgroundImage">
+        <div class="inputBar">
+          <input type="text" name="lname" placeholder="Enter your web data connector URL here"></input>
+        </div>
+      </div>
+            <div class="recentConnectors">
+        <h1>Recent Connectors</h1>
+        <ul class="recentConnectorsList">
+           
+<!-- Strava Connection – http://strava.com/WDC/Connector.html
+Twitter WDC– https://github.com/projects/WebDataConnector/Twitter_v2.html
+Test Connector – http://localhost:8888/TestConnector.html
+MadMoney Connector – http://tableau-server/WDC/Connectors/MadMoney.html
+ -->
+
+          <li><a href="http://yahoo.com/tableau/StockQuotes.html"><span class="pageTitle">Stock Quote Connector</span><span class="pageUrl">http://yahoo.com/tableau/StockQuotes.html</span></li>
+        </ul>
+      </div>
+      <div class="footer">
+        <div class="footerColumn" id="footer1">
+          <a href="http://tableau.com/whatIsThis.html">What is this?</a>
+        </div>
+        <div class="footerColumn" id="footer2">
+          <a href="http://tableau.com/documentation.html">Documentation</a>
+        </div>
+        <div class="footerColumn" id="footer3">
+          <a href="http://tableau.com/buildAConnector.html">Build a connector</a>
+        </div>
+      </div>
+  </div>
+  </body>
+</html>

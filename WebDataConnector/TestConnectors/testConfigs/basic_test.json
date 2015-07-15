@@ -1,0 +1,10 @@
+{
+	"autoSubmit": false,
+	"delayTime": 2000,
+	"fieldNames": ["String Column Header", " An Integer Column", "The Date", "True or False?"],
+	"fieldTypes": ["string", "int", "date", "bool" ],
+	"connectionData": "{BLAH, BLAH, BLAH}",
+	"connectionName": "basic_test Connector",
+	"numRows": 550,
+	"chunkSize": 20
+}

@@ -1,0 +1,33 @@
+<html>
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <head>
+    <link type="text/css" rel="stylesheet" href="css/TestConnector.css"></link>
+    <title>Error Connector - Abort During getTableData</title>
+    <script src="js/jquery-1.11.1.min.js" type="text/javascript"></script>
+    <script src="../WebDataConnector_sdk/js/tableauwdc-1.1.0.js" type="text/javascript"></script>
+    <script type="text/javascript">
+    var myConnector = tableau.makeConnector();
+
+    myConnector.init = function() {
+        tableau.initCallback();
+        
+        setTimeout(function(){ 
+            tableau.submit(); }, 
+        3000);
+    }
+    
+    myConnector.getColumnHeaders = function() {
+        tableau.headersCallback(["column 1"], ["string"]);
+    }
+    
+    myConnector.getTableData = function(lastRecordNumber) {
+        tableau.abortWithError("This is a WDC developer reported error called during get table data");
+    }
+    
+    tableau.registerConnector(myConnector);
+    </script>
+  </head>
+  <body>
+    <h3>This connector will auto-submit after 3 seconds and give you an error during the call to get table data</h3>
+  </body>
+</html>

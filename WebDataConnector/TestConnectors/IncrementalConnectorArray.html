@@ -1,0 +1,162 @@
+<html>
+<meta http-equiv="Cache-Control" content="no-store" />
+
+<!--
+    The example below generates a stream of pairs of <integer, datetime>.   
+    It supports Incremental Refresh, at most every 5 seconds.
+    The incrementalRefreshColumn is 'day_and_time' (a datetime).
+    The lastRecordToken is the current-time in milliseconds.   
+-->
+
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+<script src="../WebDataConnector_sdk/js/tableauwdc-1.1.0.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+var count;
+
+var myConnector = tableau.makeConnector();
+
+myConnector.init = function() 
+{
+  if (!tableau) {
+      alert("Incremental init- tableau NOT defined!");
+    return;
+  }
+    tableau.incrementalExtractColumn = "day_and_time";
+    tableau.log("Incremental - init");
+    count = 0;
+    tableau.initCallback();
+}
+
+myConnector.shutdown = function() {
+    tableau.shutdownCallback();
+}
+
+
+myConnector.getColumnHeaders = function()
+{
+
+  var connectionData = tableau.connectionData;
+  tableau.log("Incremental - getColumnHeaders connectionData=" + connectionData);
+
+  var fieldNames = ["x", "day", "day_and_time", "true_or_false", "color", "millis"];
+  var fieldTypes = ['float', 'date', 'datetime', 'bool', 'string', 'int' ];
+
+  try {
+    tableau.headersCallback(fieldNames, fieldTypes);
+  }
+  catch (err) {
+    alert(err.Message);
+  }
+}
+
+
+myConnector.getTableData = function(lastRecordNumber) {
+
+    tableau.log("Enter getTableData(" + lastRecordNumber + ")");
+
+    var connectionData = tableau.connectionData;
+    var start_date;
+    // we may have received an iso8601 date.   if it's not zero, that's what we think we got
+    var possible_int = parseInt(lastRecordNumber);
+    if (!isNaN(possible_int) && (possible_int !== 0)) {
+        start_date = new Date(lastRecordNumber); // lastRecordNumber is a String
+    }
+    else {
+        start_date = new Date(1970, 0, 0, 0, 0, 0, 0);
+    }
+    tableau.log("start_date is " + start_date.toISOString());
+    lastRecordNumber = start_date;
+
+    var params = ParseConnectionData(connectionData);
+
+    try {
+        var max_iterations = parseInt(params['max_iterations']); 
+        tableau.log("max_iterations = " + max_iterations.toString());                                
+
+        var colors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"];
+        var data = [];
+        var now = Date();
+        if (count < 2) {
+            date_and_time = new Date(start_date);                            
+            for (i = 0; i < max_iterations; i++) {
+                var millis = date_and_time.getTime();
+                millis += 1000 * 60  ;    //add a minute
+                date_and_time.setTime(millis);
+                date_only = new Date(date_and_time.getTime());                            
+                date_only.setHours(0, 0, 0, 0);
+                lastRecordNumber = date_and_time;
+                data.push([i, date_only.toISOString(), date_and_time.toISOString(), i % 2, colors[i % colors.length], date_and_time.getTime() ]);
+            }//for   
+        }//endif
+    }
+    catch (err) {
+        var msg = "Incremental error parsing connection data: " + err.message + "\n\n";
+        tableau.log(msg);
+    }
+
+    count += 1;
+    tableau.log("Exit getTableData(" + lastRecordNumber + ")");
+    tableau.dataCallback(data, lastRecordNumber.toISOString(), data.length != 0);
+}
+
+
+// should be ":" separated, and in form "x1=3.4:x2=3.5"
+function ParseConnectionData(connectionData)
+{
+    var params = [];
+
+    try {
+        var hash;
+        var q = connectionData.split(':');
+        if (q != undefined) {
+            for (var i = 0; i < q.length; i++) {
+                hash = q[i].split('=');
+                params.push(hash[1]);
+                params[hash[0]] = hash[1];
+            }
+        }
+    }
+    catch (err) {
+        var msg = "Incremental error parsing connection data: " + err.message + "\n\n";
+        tableau.log(msg);
+    }
+
+    return params;
+}
+
+$(document).ready(function () {
+    tableau.registerConnector(myConnector);
+    
+    $("#inputForm").submit(function () { // This event fires when a button is clicked
+        event.preventDefault();
+
+        tableau.log("Incremental - submit");
+
+        var max_iterations = $('input[name=max_iterations]').val(); //50;
+
+        var connectionData = ':max_iterations=' + max_iterations.toString() + '';
+        
+        tableau.log("Incremental - submit: connectionData=" + connectionData);
+        tableau.connectionData = connectionData;
+        tableau.connectionName = 'Incremental';
+        tableau.submit();
+    });
+});
+
+</script>
+</head>
+<body>
+<h2>Incremental Refresh Enabled Example Connector</h2>
+<br>
+<form id="inputForm" action="">
+  Ready to generate some data?:<br>
+  <br>
+  max_iterations: <input type="number" name="max_iterations" value="20" style="width: 50px;" /> <br>
+  <br>
+  <input type="submit" value="Go!">
+</form>
+
+</body>
+</html>

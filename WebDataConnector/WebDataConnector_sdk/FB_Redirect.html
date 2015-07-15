@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Facebook Login JavaScript Example</title>
+<meta charset="UTF-8">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js" type="text/javascript"></script>
+<script src="js/facebook_connector_shared.js" type="text/javascript"></script>
+</head>
+<script type="text/javascript">
+
+$(document).ready(function() {
+  // Get the login link from the shared javascript library
+  $('#loginLink').attr('href', _getFacebookAuthUrl());
+
+  var getAccessCode = function() {
+    var results = new RegExp('[\\?&]' + '#access_token' + '=([^&#]*)').exec(window.location.href);
+    if (!results || results.length != 2) {
+      return null;
+    }
+
+    return results[1];
+  };
+
+  // Set the access token if we have one and redirect over to the actual WDC page
+  var accessToken = getAccessCode();
+  if (!!accessToken) {
+    $.cookie('fb_access_token', accessToken, { path: '/' });
+    window.location = "./FacebookWDC.html";
+  }
+});
+</script>
+<body>
+<a id="loginLink">Login!</a>
+
+</body>
+</html>

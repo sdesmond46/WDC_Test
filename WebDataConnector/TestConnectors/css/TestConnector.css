@@ -1,0 +1,40 @@
+html {
+	background-color: lightgrey;
+}
+
+body {
+    text-align: center;
+    width: 550px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: white;
+    padding: 5px;
+}
+
+#errorDiv {
+	background-color: red;
+	color: white;
+	padding: 3px;
+	display: none;
+}
+
+.sample {
+	text-align: left;
+	white-space: pre-wrap;
+	font-family: monospace;
+	width: 520px;
+	margin-left: auto;
+	margin-right: auto;
+	background-color: lightgoldenrodyellow;
+	border-style: solid;
+    border-width: medium;
+    padding: 3px;
+}
+
+.documentation {
+	text-align: left;
+}
+
+.fieldName {
+	font-weight:bold;
+}

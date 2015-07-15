@@ -1,0 +1,239 @@
+<html>
+<head>
+<title>json Connector</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
+<!-- <script src="https://public.tableau.com/javascripts/api/tableauwdc-1.1.0.js" type="text/javascript"></script> -->
+<script src="../js/tableauwdc-1.1.0.js" type="text/javascript"></script>
+<script type="text/javascript">
+ 
+(function() {
+
+  var myConnector = tableau.makeConnector();
+
+  myConnector.init = function () {
+    tableau.connectionName = 'JSON data';
+    tableau.initCallback();
+  };
+
+  myConnector.getColumnHeaders = function() {
+    _retrieveJsonData(function (tableData) {
+      var headers = tableData.headers;
+      var fieldNames = [];
+      var fieldTypes = [];
+
+      for (var fieldName in headers) {
+        if (headers.hasOwnProperty(fieldName)) {
+          fieldNames.push(fieldName);
+          fieldTypes.push(headers[fieldName]);
+        }
+      }
+      tableau.headersCallback(fieldNames, fieldTypes); // tell tableau about the fields and their types
+    });
+  };
+      
+  myConnector.getTableData = function (lastRecordToken) {
+    _retrieveJsonData(function (tableData) {
+      var rowData = tableData.rowData;
+      tableau.dataCallback(rowData, rowData.length.toString(), false);
+    });
+  };
+
+  tableau.registerConnector(myConnector);
+})();
+
+function _retrieveJsonData(retrieveDataCallback) {
+  if (!window.cachedTableData) {
+    var conData = JSON.parse(tableau.connectionData);
+    var jsonString = conData.jsonString;
+    if (conData.jsonUrl) {
+      var conUrl = _buildConnectionUrl(conData.jsonUrl);
+      // handle the json data from the remote source.      
+      var xhr = $.ajax({ 
+        url: conUrl, 
+        dataType: 'json', 
+        success: function(data) 
+        {
+          window.cachedTableData = _jsToTable(data);
+          retrieveDataCallback(window.cachedTableData);
+        }
+      });
+      return;
+    }
+    try {
+      window.cachedTableData = _jsToTable(JSON.parse(conData.jsonString));
+    }
+    catch (e) {
+      tableau.abortWithError("unable to parse json data");
+      return;
+    }
+  }
+  retrieveDataCallback(window.cachedTableData);
+}
+
+function _jsToTable(objectBlob) {
+  var rowData = _flattenData(objectBlob);
+  var headers = _extractHeaders(rowData);
+  return {"headers":headers, "rowData":rowData};
+}
+
+function _flattenData(objectBlob) {
+  // first find the longest array
+  var longestArray = _findLongestArray(objectBlob, []);
+  if (!longestArray || longestArray.length == 0) {
+    // if no array found, just wrap the entire object blob in an array
+    longestArray = [objectBlob];
+  }
+  for (var ii = 0; ii < longestArray.length; ++ii) {
+    _flattenObject(longestArray[ii]);
+  }
+  return longestArray;
+}
+
+function _flattenObject(obj) {
+  for (var key in obj) {
+    if (obj.hasOwnProperty(key) && typeof obj[key] == 'object') {
+      var subObj = obj[key];
+      _flattenObject(subObj);
+      for (var k in subObj) {
+        if (subObj.hasOwnProperty(k)) {
+          obj[key + '_' + k] = subObj[k];
+        }
+      }
+      delete obj[key];
+    }
+  }
+}
+
+function _findLongestArray(obj, bestSoFar) {
+  if (!obj) {
+    // skip null/undefined objects
+    return bestSoFar;
+  }
+
+  // if an array, just return the longer one
+  if (obj.constructor === Array) {
+    // I think I can simplify this line to
+    // return obj;
+    // and trust that the caller will deal with taking the longer array
+    return (obj.length > bestSoFar.length) ? obj : bestSoFar;
+  }
+  if (typeof obj != "object") {
+    return bestSoFar;
+  }
+  for (var key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      var subBest = _findLongestArray(obj[key], bestSoFar);
+      if (subBest.length > bestSoFar.length) {
+        bestSoFar = subBest;
+      }
+    }
+  }
+  return bestSoFar;
+}
+
+function _extractHeaders(rowData) {
+  var toRet = {};
+  for (var row = 0; row < rowData.length; ++row) {
+    var rowLine = rowData[row];
+    for (var key in rowLine) {
+      if (rowLine.hasOwnProperty(key)) {
+        if (!(key in toRet)) {
+          toRet[key] = _determineType(rowLine[key]);
+        }
+      }
+    }
+  }
+  return toRet;
+}
+
+function _determineType(primitive) {
+  // possible types: 'float', 'date', 'datetime', 'bool', 'string', 'int'
+  if (parseInt(primitive) == primitive) return 'int';
+  if (parseFloat(primitive) == primitive) return 'float';
+  if (isFinite(new Date(primitive).getTime())) return 'datetime';
+  return 'string';
+}
+
+function _submitToJsonToTableau(jsonString, jsonUrl) {
+    var conData = {"jsonString" : jsonString, "jsonUrl": jsonUrl};
+    tableau.connectionData = JSON.stringify(conData);
+    tableau.submit();  
+}
+
+function _buildConnectionUrl(url) {
+  // var yqlQueryBase = "http://query.yahooapis.com/v1/public/yql?q=";
+  // var query = "select * from html where url='" + url + "'";
+  // var restOfQueryString = "&format=json";
+  // var yqlUrl = yqlQueryBase + encodeURIComponent(query) + restOfQueryString;
+  // return yqlUrl;
+  return url;
+}
+
+$(document).ready(function(){
+  var cancel = function (e) {    
+      e.stopPropagation();
+      e.preventDefault();
+  }
+  $("#inputForm").submit(function(e) { // This event fires when a button is clicked
+    // Since we use a form for input, make sure to stop the default form behavior
+    cancel(e);
+    var jsonString = $('textarea[name=jsonText]')[0].value.trim();
+    var jsonUrl = $('input[name=jsonUrl]')[0].value.trim();
+    _submitToJsonToTableau(jsonString, jsonUrl);
+  });
+  var ddHandler = $("#dragandrophandler");
+  ddHandler.on('dragenter', function (e) 
+  {
+      cancel(e);
+      $(this).css('border', '2px solid #0B85A1');
+  }).on('dragover', cancel)
+    .on('drop', function (e) 
+  {
+       $(this).css('border', '2px dashed #0B85A1');
+       e.preventDefault();
+       var files = e.originalEvent.dataTransfer.files;
+       var file = files[0];
+       var reader = new FileReader();
+       reader.onload = function(e) { _submitToJsonToTableau(reader.result); };
+       reader.readAsText(file);
+  });
+
+  $(document).on('dragenter', cancel)
+             .on('drop', cancel)
+             .on('dragover', function (e) 
+  {
+    cancel(e);
+    ddHandler.css('border', '2px dashed #0B85A1');
+  });
+});
+
+</script>
+
+<style>
+#dragandrophandler {
+  border:1px dashed #999;
+  width:300px;
+  color:#333;
+  text-align:left;vertical-align:middle;
+  padding:10px 10px 10 10px;
+  margin:10px;
+  font-size:150%;
+}
+</style>
+</head>
+<body>
+
+<form id="inputForm" action="">
+  Enter a URL for JSON data: 
+  <input type="text" name="jsonUrl" size="50" />  
+  <br>
+  <div id="dragandrophandler">Or Drag & Drop Files Here</div>
+  <br>
+  Or paste JSON data below
+  <br>
+  <textarea name="jsonText" rows="10" cols="70"/></textarea>
+  <input type="submit" value="Submit">
+</form>
+
+</body>
+</html>
