@@ -87,9 +87,9 @@
 
         if (window.webkit && 
             window.webkit.messageHandlers && 
-            window.webkit.messageHandlers.wdcTest) {
+            window.webkit.messageHandlers.wdcHandler) {
 
-            window.webkit.messageHandlers.wdcTest.postMessage(messagePayload);
+            window.webkit.messageHandlers.wdcHandler.postMessage(messagePayload);
         } else if (!_sourceWindow) {
             throw "Looks like the WDC is calling a tableau function before tableau.init() has been called."
         } else {
@@ -156,6 +156,8 @@
     // Add global error handler. If there is a javascript error, this will report it to Tableau
     // so that it can be reported to the user.
     window.onerror = function (message, file, line, column, errorObj) {
+        tableau.log("error occured");
+
         if (tableau._hasAlreadyThrownErrorSoDontThrowAgain) {
             return true;
         }
