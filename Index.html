@@ -3,151 +3,37 @@
 <head>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
 <script src="shim.js" type="text/javascript"></script>
-<script type="text/javascript">
- 
-(function() {
+<style type="text/css">
+body {
+  text-align: center;
+}
 
-  var myConnector = tableau.makeConnector();
-
-  myConnector.init = function() {
-    // If we are in the interactive phase, repopulate the input text box if there is connectionData present. 
-    // This is hit when editing a connection in Tableau.
-    if (tableau.interactive) {
-      $('input[type=text]').val(tableau.connectionData);
-    }
-
-    tableau.connectionName = "Samm's stock quote connector";
-    tableau.log("this is some random data");
-    tableau.initCallback();
-  }
-
-  myConnector.shutdown = function () {
-      tableau.shutdownCallback();
-  };
-   
-  myConnector.getColumnHeaders = function() {
-    var fieldNames = ['Ticker', 'Day', 'Close'];
-    var fieldTypes = ['string', 'date', 'float'];
-    tableau.headersCallback(fieldNames, fieldTypes); // tell tableau about the fields and their types
-  }
-   
-  myConnector.getTableData = function(lastRecordToken) {
-    tableau.log("Get Table data has been called");
-
-    var endDate = new Date(),
-        ticker = tableau.connectionData,
-        startDate = new Date();
-    // set the start of the range to be 1 year ago
-    startDate.setYear(endDate.getFullYear() - 1);
-    
-    var connectionUrl = _buildUrl(ticker, startDate, endDate);
-    tableau.log("Connection URL is " + connectionUrl);
-
-    $.getJSON( connectionUrl, function( data ) {
-      tableau.log("Successfully retrieved data");
-
-      var quotes = data.query.results.quote;
-      var ii;
-      var toRet = [];
-
-      // mash the data into an array of objects
-      for (ii = 0; ii < quotes.length; ++ii) {
-          // Each entry can be a list of values in the same order as the columns
-          //var entry = [quotes[ii].Symbol, quotes[ii].Date, quotes[ii].Close];
-          // or an object where the column names are the keys of the map
-          var entry = {'Ticker': quotes[ii].Symbol, 
-                       'Day': quotes[ii].Date, 
-                       'Close': quotes[ii].Close};
-          toRet.push(entry);
-      }
-      // Call back to tableau with the table data and the new record number (this is stored as a string)
-      tableau.dataCallback(toRet, toRet.length.toString(), false);
-    }).fail(function() {
-      tableau.log( "error" );
-    });
-
-    // var xhr = $.ajax({
-    //     url: connectionUrl,
-    //     dataType: 'json',
-    //     success: function (data) {
-    //         tableau.log("Successfully retrieved data");
-
-    //         var quotes = data.query.results.quote;
-    //         var ii;
-    //         var toRet = [];
-
-    //         // TODO - remove
-    //         // var entry = {'Ticker': null, 
-    //         //                  'Day': 'abc', 
-    //         //                  'Close': 22};
-    //         // toRet.push(entry);
-
-    //         // mash the data into an array of objects
-    //         for (ii = 0; ii < quotes.length; ++ii) {
-    //             // Each entry can be a list of values in the same order as the columns
-    //             //var entry = [quotes[ii].Symbol, quotes[ii].Date, quotes[ii].Close];
-    //             // or an object where the column names are the keys of the map
-    //             var entry = {'Ticker': quotes[ii].Symbol, 
-    //                          'Day': quotes[ii].Date, 
-    //                          'Close': quotes[ii].Close};
-    //             toRet.push(entry);
-    //         }
-    //         // Call back to tableau with the table data and the new record number (this is stored as a string)
-    //         tableau.dataCallback(toRet, toRet.length.toString(), false);
-    //     },
-    //     error: function (xhr, ajaxOptions, thrownError) {
-
-    //       // add something to the log and return an empty set if there was problem with the connection
-    //       tableau.log("connection error: " + xhr.responseText + "\n" + thrownError);
-    //       tableau.dataCallback([], lastRecordToken, false);
-    //     }
-    // });
-  }
-
-  // private methods
-
-  // Takes a ticker symbol, a start date and an end date, and constructs a URL for the Yahoo! stock quote API
-  function _buildUrl(tickerSymbol, startDate, endDate){
-    var startDateStr = _getDateAsString(startDate),
-        endDateStr = _getDateAsString(endDate),
-        data = 'select * from yahoo.finance.historicaldata where symbol = "' + tickerSymbol + '" and startDate = "' + startDateStr + '" and endDate = "' + endDateStr + '"',
-        url = 'http://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent(data) + "&env=http%3A%2F%2Fdatatables.org%2Falltables.env&format=json";
-    return url;
-  }
-  // Gets a string representation of a date that can be used with the Yahoo! API.
-  function _getDateAsString(date){
-    return date.getFullYear()  + '-' + _makeTwoDigits(date.getMonth() + 1) + '-' + _makeTwoDigits(date.getDate());
-  }
-  // Pads a given number with leading 0s so that there are two characters in the string. Example: _makeTwoDigits(1) --> "01"
-  function _makeTwoDigits(num) {
-    return num < 9 ? "0" + num.toString() : num.toString();
-  }
- 
-  $(document).ready(function() {
-    $("#inputForm").submit(function() { // This event fires when a button is clicked
-      event.preventDefault();
-      var textField = $('input[type=text]'); // get the ticker symbol
-      if (!textField || textField.length == 0) {
-        return;
-      }
-      var textFieldData = textField[0].value.trim();
-      tableau.connectionData = textFieldData; // set the ticker symbol as the connection data so we can get to it when we fetch the data
-      tableau.connectionName = 'Stock quote: ' + textFieldData; // name the data source. This will be the data source name in Tableau
-      tableau.submit();
-    });
-  });
-
-  tableau.registerConnector(myConnector);
-})();
- 
-</script>
+a {
+  text-decoration: none;
+  line-height: 2;
+  font-size: x-large;
+  color: #555555;
+}
+</style>
 </head>
 <body>
-<form id="inputForm" action="">
-  Enter a ticker symbol: <input type="text" name="ticker" style="width: 150px;" />
-  <br>
-  <input type="submit" value="Get Stock Data">
-</form>
- 
+  <h1>Connectors Hosted Here</h1>
+  <div>
+    <a href="./WebDataConnector/WebDataConnector_sdk/StockQuoteConnector_final.html">Stock Quote Final</a>
+    <br />
+    <a href="./WebDataConnector/WebDataConnector_sdk/StockQuoteConnector_advanced.html">Stock Quote Advanced</a>
+    <br />
+    <a href="./WebDataConnector/WebDataConnector_sdk/GoogleSheetsConnector.html">Google Sheets Connector</a>
+    <br />
+    <a href="./WebDataConnector/WebDataConnector_sdk/Examples/IncrementalUpdateConnector.html">Incremental Update Test</a>
+    <br />
+    <a href="./WebDataConnector/WebDataConnector_sdk/Examples/jsonConnector.html">JSON Connector</a>
+    <br />
+    <a href="./WebDataConnector/WebDataConnector_sdk/Examples/MadMoneyScraper.html">Mad Money Scraper</a>
+    <br />
+    <a href="./WebDataConnector/WebDataConnector_sdk/Examples/SocrataConnector.html">Socrata Connector</a>
+    <br />
+    <a href="./WebDataConnector/WebDataConnector_sdk/Examples/xmlConnector.html">XML Connector</a>
+  </div>
 </body>
 </html>
