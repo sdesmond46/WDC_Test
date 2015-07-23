@@ -156,12 +156,14 @@ myConnector.getTableData = function(lastRecordToken) {
     // Go through each row of the data array
     for (var i in data.data) {
 
+
+      var post = data.data[i];
+
       if (!post.hasOwnProperty("created_time")) {
         console.log("Post has no created time. Post id = " + post["id"]);
         continue;
       }
-
-      var post = data.data[i];
+      
       var id = post["id"];
       var permalink = post["link"];
       var ticks = parseInt(post["created_time"]);
