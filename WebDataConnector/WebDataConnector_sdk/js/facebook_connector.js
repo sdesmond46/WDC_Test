@@ -168,7 +168,7 @@ myConnector.getTableData = function(lastRecordToken) {
       var createdTime = new Date(ticks * 1000); // convert to MS from seconds
 
       // Get the base row data set up
-      var rowData = {
+      var rowData = { 
         "post_id" : id,
         "date" : createdTime.toISOString(),
         "user_name" : "",
