@@ -155,6 +155,12 @@ myConnector.getTableData = function(lastRecordToken) {
     var returnData = [];
     // Go through each row of the data array
     for (var i in data.data) {
+
+      // do a check to see if there is a created time. Sometimes there isn't for some reason
+      if (!post.hasOwnProperty("created_time")) {
+        continue;
+      }
+
       var post = data.data[i];
       var id = post["id"];
       var permalink = post["link"];
