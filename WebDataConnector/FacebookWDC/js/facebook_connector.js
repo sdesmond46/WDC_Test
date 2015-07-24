@@ -163,7 +163,7 @@ myConnector.getTableData = function(lastRecordToken) {
         console.log("Post has no created time. Post id = " + post["id"]);
         continue;
       }
-      
+
       var id = post["id"];
       var permalink = post["link"];
       var ticks = parseInt(post["created_time"]);
@@ -195,7 +195,7 @@ myConnector.getTableData = function(lastRecordToken) {
     }
 
     // If there is a next page token, we have more data
-    var moreData = nextPageToken.length > 0;
+    var moreData = nextPageToken.length > 0 && returnData.length >= 25; // Facebook is returning next page tokens when it shouldn't sometimes
     tableau.dataCallback(returnData, nextPageToken, moreData);
   });
 };
