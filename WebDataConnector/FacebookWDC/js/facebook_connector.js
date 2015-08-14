@@ -136,7 +136,7 @@ myConnector.getTableData = function(lastRecordToken) {
   function(data, status, jqXHR) {
     var returnData = [];
 
-    console.log("Received " + data.data.length, " posts.");
+    console.log("Received " + data.data.length + " posts.");
 
     // Go through each row of the data array
     for (var i in data.data) {
