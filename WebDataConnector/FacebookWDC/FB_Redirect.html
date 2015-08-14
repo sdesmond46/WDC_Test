@@ -16,7 +16,7 @@ $(document).ready(function() {
   // Set the access token if we have one and redirect over to the actual WDC page
   var accessToken = _getAccessTokenFromQueryString();
   if (!!accessToken) {
-    $.cookie('fb_access_token', accessToken, { path: '/' });
+    $.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, { path: '/' });
     window.location = "./FacebookWDC.html";
   }
 });
