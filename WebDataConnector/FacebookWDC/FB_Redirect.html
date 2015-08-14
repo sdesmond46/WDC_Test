@@ -18,11 +18,14 @@ $(document).ready(function() {
   if (!!accessToken) {
     $.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, { path: '/' });
     window.location = "./FacebookWDC.html";
+  } else {
+  	// If we don't have an access token, redirect the user to sign in to facebook
+  	window.location = _getFacebookAuthUrl();
   }
 });
 </script>
-<body>
-<a id="loginLink">Login!</a>
-
+<body style="text-align:center;">
+<p>This page should automatically redirect for you to log in to Facebook.</p>
+<p>If it does not please <a id="loginLink">Click Here</a> </p>
 </body>
 </html>
