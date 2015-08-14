@@ -1,8 +1,9 @@
 $(document).ready(function() {
-  $("#inputForm").submit(function() { // This event fires when a button is clicked
+  // Wire up the submission form once the document loads
+  $("#inputForm").submit(function() {
     event.preventDefault();
     tableau.connectionData = "";
-    tableau.connectionName = "Samm's Facebook connector";
+    tableau.connectionName = "Facebook connector for personal pages";
     tableau.submit();
   });
 });
@@ -23,72 +24,52 @@ var createRequestUrl = function(obj, fieldsString, accessToken) {
   return url;
 }
 
+// Helper function to retrieve the access token either from a cookie or from the tableau.password field
 var getPassword = function() {
-  var cookie = $.cookie('fb_access_token');
+  var cookie = $.cookie(ACCESS_TOKEN_COOKIE_NAME);
   var password = "";
   if (!!cookie) {
     password = cookie; // we have a cookie. Lets eat it
   } else if (!!tableau && !!tableau.password && tableau.password.length > 0) {
-    password = tableau.password;
+    password = tableau.password; // There is an access token stored in the tableau.password property
   }
 
   // TODO - validate the access token is still good even if it is not empty
+  // We could use the graph.facebook.com/debug_token endpoint to validate
   return password;
 }
 
- // Set up the actual connector
+ // Set up the actual Tableau connector
 var myConnector = tableau.makeConnector();
 
 myConnector.init = function() {
+  // First check the state of our password. If we don't have one, we'll need to prompt for auth
   var pw = getPassword();
   var needsAuth = pw.length == 0;
 
-  // Do a check if tableau.phase is defined. This will allow this connector to work before and after the oauth changes
-  if (!tableau.phase) {
-    if (tableau.interactive) {
-      if (needsAuth) {
-        window.location = _getFacebookAuthUrl();
-      } else {
-        tableau.password = pw;
-        tableau.initCallback();
-      }
+  // Set the alwaysShowAuthUI to cause WDC to reprompt us when re-opening a workbook and refreshing an extract
+  tableau.alwaysShowAuthUI = true;
+
+  console.log("Tableau phase is " + tableau.phase);
+  if (tableau.phase == tableau.phaseEnum.gatherDataPhase) {
+    // We're in the headless, gathering data phase
+    if (needsAuth) {
+      tableau.abortWithError("No access token provided to communicate with Facebook. Cannot gather data.");
     } else {
-      if (needsAuth) {
-        tableau.abortWithError("I need a password but I don't have a valid one");
-      } else {
-        tableau.password = pw;
-        tableau.initCallback();
-      }
+      tableau.password = pw;
+      tableau.initCallback();
     }
   } else {
-    tableau.alwaysShowAuthUI = true;
-
-    if (tableau.phase == "interactive") {
-      console.log("Im in interactive!");
-      if (needsAuth) {
-        window.location = _getFacebookAuthUrl();
-      } else {
-        tableau.password = pw;
-        tableau.initCallback();
-      }
-    } else if (tableau.phase == "auth") {
-      if (needsAuth) {
-        window.location = _getFacebookAuthUrl(); // If we're in the auth phase, go straight to the auth url
-      } else {
-        tableau.password = pw;
-        tableau.initCallback();
-        tableau.submit(); // submit immediately since I have my auth cookie
-      }
-    } else if(tableau.phase == "gatherData") {
-      console.log("I'm in gather data!");
-      if (needsAuth) {
-        tableau.abortWithError("I need a password but I don't have a valid one");
-      } else {
-        tableau.password = pw;
-        tableau.initCallback();
-      }
+    // We are in the interactive or auth modes. If auth is needed, let's just redirect to the login page right away
+    if (needsAuth) {
+      window.location = _getFacebookAuthUrl();
     } else {
-      tableau.abortWithError("Unknown phase encountered. Uh oh");
+      tableau.password = pw;
+      tableau.initCallback();
+      if (tableau.phase == tableau.phaseEnum.authPhase) {
+        // If we have a password already, and we're in the auth phase, immediately call submit for the user to indicate we have authenticated
+        tableau.submit();
+      }
     }
   }
 }
@@ -129,7 +110,7 @@ var processLikes = function(outputArray, rowData, post) {
     $.ajax({
       url : likes.paging.next,
       type : "get",
-      async: false, // process this synchronously because why not?
+      async: false, // process this synchronously because why not? We're running in the background
       success : function(likeData) {
         for (var j in likeData.data) {
           processLike(likeData.data[j]);
@@ -155,15 +136,7 @@ myConnector.getTableData = function(lastRecordToken) {
     var returnData = [];
     // Go through each row of the data array
     for (var i in data.data) {
-
-
       var post = data.data[i];
-
-      if (!post.hasOwnProperty("created_time")) {
-        console.log("Post has no created time. Post id = " + post["id"]);
-        continue;
-      }
-
       var id = post["id"];
       var permalink = post["link"];
       var ticks = parseInt(post["created_time"]);
@@ -195,10 +168,12 @@ myConnector.getTableData = function(lastRecordToken) {
     }
 
     // If there is a next page token, we have more data
-    var moreData = nextPageToken.length > 0 && returnData.length >= 25; // Facebook is returning next page tokens when it shouldn't sometimes
+    var moreData = nextPageToken.length > 0;
     tableau.dataCallback(returnData, nextPageToken, moreData);
+  })
+  .fail(function(jqXHR, textStatus, errorThrown) {
+    tableau.abortWithError("Error encountered loading data from Facebook. Error was '" + textStatus + "'");
   });
 };
 
 tableau.registerConnector(myConnector);
-

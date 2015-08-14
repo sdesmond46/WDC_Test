@@ -13,17 +13,8 @@ $(document).ready(function() {
   // Get the login link from the shared javascript library
   $('#loginLink').attr('href', _getFacebookAuthUrl());
 
-  var getAccessCode = function() {
-    var results = new RegExp('[\\?&]' + '#access_token' + '=([^&#]*)').exec(window.location.href);
-    if (!results || results.length != 2) {
-      return null;
-    }
-
-    return results[1];
-  };
-
   // Set the access token if we have one and redirect over to the actual WDC page
-  var accessToken = getAccessCode();
+  var accessToken = _getAccessTokenFromQueryString();
   if (!!accessToken) {
     $.cookie('fb_access_token', accessToken, { path: '/' });
     window.location = "./FacebookWDC.html";
