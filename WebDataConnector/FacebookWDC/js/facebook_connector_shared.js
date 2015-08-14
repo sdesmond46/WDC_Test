@@ -34,7 +34,7 @@ function _getFacebookAuthUrl() {
 function _getUrlParameterByName(name) {
     var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location);
     return match ?
-        decodeURIComponent(match[1].replace(/+/g, ' '))
+        decodeURIComponent(match[1])
         : null;
 }
 
