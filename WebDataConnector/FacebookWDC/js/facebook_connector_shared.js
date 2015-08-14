@@ -31,8 +31,8 @@ function _getFacebookAuthUrl() {
 
 // Gets a parameter from the query string by name
 // Adapted from http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
-function _getUrlHashParameterByName(name) {
-    var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.hash);
+function _getUrlParameterByName(name) {
+    var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location);
     return match ?
         decodeURIComponent(match[1].replace(/+/g, ' '))
         : null;
@@ -42,6 +42,6 @@ function _getUrlHashParameterByName(name) {
 // If no access token is there, returns null
 function _getAccessTokenFromQueryString() {
 	var accessTokenName = "#access_token";
-	var token = _getUrlHashParameterByName(accessTokenName);
+	var token = _getUrlParameterByName(accessTokenName);
 	return token;
 }
