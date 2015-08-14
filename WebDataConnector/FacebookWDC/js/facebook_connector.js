@@ -142,6 +142,11 @@ myConnector.getTableData = function(lastRecordToken) {
       var ticks = parseInt(post["created_time"]);
       var createdTime = new Date(ticks * 1000); // convert to MS from seconds
 
+      if (isNaN(createdTime.getTime())) {
+        // Some events will not be returned with a valid time (like when you were born). We need to filter these out
+        continue;
+      }
+
       // Get the base row data set up
       var rowData = {
         "post_id" : id,
