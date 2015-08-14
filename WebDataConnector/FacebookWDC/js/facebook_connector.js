@@ -9,7 +9,7 @@ $(document).ready(function() {
 });
 
 // Creates our url to request data from facebook
-var createRequestUrl = function(obj, fieldsString, accessToken) {
+var createRequestUrl = function(obj, fieldsString, accessToken, pageSize) {
   var url = "https://graph.facebook.com/v2.3/";
   url += obj + "?";
 
@@ -18,6 +18,7 @@ var createRequestUrl = function(obj, fieldsString, accessToken) {
   queryParmas += "&debug=all&format=json&method=get&pretty=0&suppress_http_code=1";
   queryParmas += "&fields=" + encodeURIComponent(fieldsString);
   queryParmas += "&date_format=U";
+  queryParmas += "&limit=" + pageSize.toString();
 
   url += queryParmas;
 
@@ -127,7 +128,7 @@ myConnector.getTableData = function(lastRecordToken) {
   if (lastRecordToken) {
     requestUrl = lastRecordToken; // If there's a last record token, that means we're doing soem paging
   } else {
-    requestUrl = createRequestUrl("me/feed", "id,likes,created_time,link", accessToken);
+    requestUrl = createRequestUrl("me/feed", "id,likes,created_time,link", accessToken, 200);
   }
 
   $.get(requestUrl,
