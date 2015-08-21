@@ -3,15 +3,25 @@
 <head>
 <title>Facebook Login JavaScript Example</title>
 <meta charset="UTF-8">
+
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
 <script src="../WebDataConnector_sdk/js/tableauwdc-1.1.0.js" type="text/javascript"></script>
 <script src="js/facebook_connector_shared.js" type="text/javascript"></script>
 <script src="js/facebook_connector.js" type="text/javascript"></script>
 </head>
 <body>
-	<form id="inputForm" action="">
-	  <input type="submit" value="Get Facebook Data">
-	</form>
+	<div class="container" style="text-align:center;">
+		<h1>Personal Pages Facebook Connector</h1>
+		<p>This connector will pull in information about the posts appearing on your Facebook wall. Each row represents a post or a like. If a row has a like_count of 0, that means no one liked the post and the username and id will be blank.</p>
+		<form id="inputForm" action="">
+		  <input type="submit" value="Get My Facebook Data!">
+		</form>
+	</div>
 </body>
 </html>
